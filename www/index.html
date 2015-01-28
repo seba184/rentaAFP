@@ -5,12 +5,12 @@
 <meta name="format-detection" content="telephone=no" />
 <meta name="msapplication-tap-highlight" content="no" />
 <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
-<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+<!-- <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"/> -->
 <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
 <link rel="stylesheet" href="css/estilos.css" />
 <script src="js/jquery-1.11.2.min.js"></script>
 <script src="js/jquery.mobile-1.4.5.min.js"></script>
-<title>Hello World</title>
+<title>Renta AFP</title>
 </head>
 <body>
 <div data-role="page" id="inicio">
@@ -21,7 +21,7 @@
   </center>
 </div>
 <div data-role="main" class="ui-content">
-<form action="#">
+<form id="parametros">
 <fieldset>
   <label for="nameAFP">Mi AFP es:</label>
   <select name="nameAFP" id="nameAFP">
@@ -41,24 +41,87 @@
     <option>Cartola Abril 2015</option>
     <option>Cartola Agosto 2015</option>
   </select>
-  <p>
-    <input type="submit" value="Ver informe" style="background-color: #000000">
 </fieldset>
+
+<input type="submit" value="Ver informe" style="background-color: #000000">
+</form>
+
 </div>
 <div data-role="footer">
   <h1></h1>
 </div>
 </div>
-<div data-role="page" id="pagetwo">
+<div data-role="page" id="paginaCuotas">
   <div data-role="header">
-    <h1>Welcome To My Homepage 2</h1>
+    <h1>Resultado Diario</h1>
   </div>
   <div data-role="main" class="ui-content">
-    <p>This is Page Two. If you click on the link below, it will take you to Page One.</p>
-    <a href="#inicio">Volver a inicio</a> </div>
+	<div class="ui-grid-e" id="resultados">
+	</div>
+    <a href="#inicio">Volver</a> </div>
   <div data-role="footer">
-    <h1>Footer Text</h1>
   </div>
 </div>
+<script>
+
+localStorage['serviceURL'] 	= "http://www.repuestosmac.cl/rentaAFP/";
+var serviceURL 				= localStorage['serviceURL'];
+
+
+$("#parametros").submit(function(){
+
+	var nameAFP 				= $('#nameAFP option:selected').text();
+	var reportType				= $('#reportType option:selected').text();
+
+/*
+ $.ajax({
+           type: "POST",
+           url: serviceURL + 'traeCuotas.php?jsoncallback=?',
+           data: {nameAFP: nameAFP, reportType: reportType},
+           success: function(data)
+           {
+               alert(data);
+           }
+ });
+ */
+ 
+$.getJSON( serviceURL + 'traeCuotas.php?jsoncallback=?', { nameAFP: nameAFP, reportType: reportType})
+	.done(function(respuestaServer) {
+		
+		a = respuestaServer;
+		$("#resultados div").empty();
+		
+		$.each( respuestaServer, function( index, value ) {
+			$("#resultados").append("<div class='ui-block-a'><div class='ui-bar ui-bar-a'>"+value.nombre+"</div></div>");
+			$("#resultados").append("<div class='ui-block-b'><div class='ui-bar ui-bar-a'>"+value.fondoA+"</div></div>");
+			$("#resultados").append("<div class='ui-block-c'><div class='ui-bar ui-bar-a'>"+value.fondoB+"</div></div>");
+			$("#resultados").append("<div class='ui-block-d'><div class='ui-bar ui-bar-a'>"+value.fondoC+"</div></div>");
+			$("#resultados").append("<div class='ui-block-e'><div class='ui-bar ui-bar-a'>"+value.fondoD+"</div></div>");
+			$("#resultados").append("<div class='ui-block-f'><div class='ui-bar ui-bar-a'>"+value.fondoE+"</div></div>");
+		});
+		
+		$.mobile.changePage("#paginaCuotas")
+		
+		//alert(respuestaServer);
+		//alert(respuestaServer.mensaje + "\nGenerado en: " + respuestaServer.hora + "\n" +respuestaServer.generador)
+		
+		/*
+		if(respuestaServer.validacion == "ok"){
+		  			$.mobile.changePage("#paginaCuotas")
+		  
+		}else{
+		  alert("Problemas");
+		}
+		*/
+  
+})
+
+ 
+ //$.mobile.changePage('#paginaCuotas');
+	
+return false;
+})
+</script>
+
 </body>
 </html>
